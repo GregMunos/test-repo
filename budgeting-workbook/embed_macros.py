@@ -21,9 +21,13 @@ wb = app.books.open(xl_file)
 wb.api.VBProject.VBComponents.Remove(wb.api.VBProject.VBComponents("Module1"))
 wb.api.VBProject.VBComponents.Remove(wb.api.VBProject.VBComponents("Module2"))
 
-# Import new modules
-for mod in modules:
-    wb.api.VBProject.VBComponents.Import(os.path.abspath(mod))
+# Remove existing modules (only if removable)
+for mod in wb.api.VBProject.VBComponents:
+    try:
+        if mod.Name not in ["Sheet1", "Sheet2", "Sheet3", "ThisWorkbook"]:
+            wb.api.VBProject.VBComponents.Remove(mod)
+    except Exception as e:
+        print(f"⚠️ Skipped {mod.Name}: {e}")
 
 # Replace ThisWorkbook
 wb.api.VBProject.VBComponents.Remove(wb.api.VBProject.VBComponents("ThisWorkbook"))
